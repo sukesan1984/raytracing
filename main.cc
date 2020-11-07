@@ -1,4 +1,5 @@
 #include <iostream>
+#include "rtweekend.h"
 #include "camera.h"
 #include "sphere.h"
 #include <stdlib.h>
@@ -26,21 +27,21 @@ vec3 ray_color(const ray& r, hitable_list world, int depth) {
 
 hitable_list random_scene() {
     int n = 500;
-    int num_a = 3;
-    int num_b = 3;
+    int num_a = 1;
+    int num_b = 1;
     hitable_list world;
     world.add(make_shared<sphere>(vec3(0, -1000, 0), 1000, new lambertian(
                 vec3(0.5, 0.5, 0.5))));
     int i = 1;
     for (int a = -num_a; a < num_a; a++) {
         for (int b = -num_b; b < num_b; b++) {
-            double choose_mat = drand48();
-            vec3 center(a + 0.9 * drand48(), 0.2, b + 0.9 * drand48());
+            double choose_mat = random_double();
+            vec3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
             if ((center - vec3(4, 0.2, 0)).length() > 0.9) {
                 if (choose_mat < 0.8) {
                     world.add(make_shared<sphere>(center, 0.2, new lambertian(
-                                vec3(drand48() * drand48(), drand48() * drand48(),
-                                    drand48() * drand48()))));
+                                vec3(random_double() * random_double(), random_double() * random_double(),
+                                    random_double() * random_double()))));
                 }
                 else if (choose_mat < 0.95) {
                     world.add(make_shared<sphere>(
@@ -48,11 +49,11 @@ hitable_list random_scene() {
                             0.2,
                             new metal(
                                 vec3(
-                                    0.5 * (1 + drand48()),
-                                    0.5 * (1 + drand48()),
-                                    0.5 * (1 + drand48())
+                                    0.5 * (1 + random_double()),
+                                    0.5 * (1 + random_double()),
+                                    0.5 * (1 + random_double())
                                 ),
-                            0.5 * drand48())));
+                            0.5 * random_double())));
                 }
                 else {
                     world.add(make_shared<sphere>(center, 0.2, new dielectric(1.5)));
@@ -101,14 +102,14 @@ int main() {
         for (int i = 0; i < nx; i++) {
             vec3 col(0, 0, 0);
             for (int s = 0; s < ns; s++) {
-                double u = double(i + drand48()) /double(nx);
-                double v = double(j + drand48()) / double(ny);
+                double u = (i + random_double()) /double(nx);
+                double v = (j + random_double()) / double(ny);
                 ray r = cam.get_ray(u, v);
                 col += ray_color(r, world, 0);
             }
-            col /= double(ns);
-            col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
-            write_color(std::cout, col);
+            //col /= double(ns);
+            //col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
+            write_color(std::cout, col, ns);
         }
     }
 }
