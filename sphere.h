@@ -6,23 +6,23 @@
 class sphere: public hitable {
 	public:
 		sphere() {}
-		sphere(point3 cen, float r, material *m) : center(cen), radius(r), mat_ptr(m) {};
-		virtual bool hit(const ray& r, float tmin, float tmax,
+		sphere(point3 cen, double r, material *m) : center(cen), radius(r), mat_ptr(m) {};
+		virtual bool hit(const ray& r, double tmin, double tmax,
 				hit_record& rec) const;
 		vec3 center;
-		float radius;
+		double radius;
 		material *mat_ptr;
 };
 
-bool sphere::hit(const ray& r, float t_min, float t_max,
+bool sphere::hit(const ray& r, double t_min, double t_max,
 		hit_record& rec) const {
     vec3 oc = r.origin() - center;
-    float a = dot(r.direction(),  r.direction());
-    float b = dot(r.direction(), oc);
-    float c = dot(oc, oc) - radius * radius;
-    float discriminant = b * b - a * c;
+    double a = dot(r.direction(),  r.direction());
+    double b = dot(r.direction(), oc);
+    double c = dot(oc, oc) - radius * radius;
+    double discriminant = b * b - a * c;
     if (discriminant > 0) {
-       float temp = (-b - sqrt(discriminant)) / a;
+       double temp = (-b - sqrt(discriminant)) / a;
 	   if (temp < t_max && temp > t_min) {
 			rec.t = temp;
 			rec.p = r.at(rec.t);

@@ -19,7 +19,7 @@ vec3 ray_color(const ray& r, hitable_list world, int depth) {
         }
     } else {
         vec3 unit_direction = unit_vector(r.direction());
-        float t = 0.5 * (unit_direction.y() + 1.0);
+        double t = 0.5 * (unit_direction.y() + 1.0);
         return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
     }
 }
@@ -34,7 +34,7 @@ hitable_list random_scene() {
     int i = 1;
     for (int a = -num_a; a < num_a; a++) {
         for (int b = -num_b; b < num_b; b++) {
-            float choose_mat = drand48();
+            double choose_mat = drand48();
             vec3 center(a + 0.9 * drand48(), 0.2, b + 0.9 * drand48());
             if ((center - vec3(4, 0.2, 0)).length() > 0.9) {
                 if (choose_mat < 0.8) {
@@ -77,10 +77,10 @@ int main() {
     vec3 lookfrom(12, 2, 3);
     vec3 lookat(4, 1, 1);
 
-    float dist_to_focus = (lookfrom - lookat).length();
-    float aperture = 0.1;
-    camera cam(lookfrom, lookat, vec3(0, 1, 0), 20, float(nx) / float(ny), aperture, dist_to_focus);
-    //float R = cos(M_PI / 4);
+    double dist_to_focus = (lookfrom - lookat).length();
+    double aperture = 0.1;
+    camera cam(lookfrom, lookat, vec3(0, 1, 0), 20, double(nx) / double(ny), aperture, dist_to_focus);
+    //double R = cos(M_PI / 4);
     //list[0] = new sphere(vec3(-R, 0, -1), R,
     //        new lambertian(vec3(0, 0, 1)));
     //list[1] = new sphere(vec3(R, 0, -1), R,
@@ -101,12 +101,12 @@ int main() {
         for (int i = 0; i < nx; i++) {
             vec3 col(0, 0, 0);
             for (int s = 0; s < ns; s++) {
-                float u = float(i + drand48()) /float(nx);
-                float v = float(j + drand48()) / float(ny);
+                double u = double(i + drand48()) /double(nx);
+                double v = double(j + drand48()) / double(ny);
                 ray r = cam.get_ray(u, v);
                 col += ray_color(r, world, 0);
             }
-            col /= float(ns);
+            col /= double(ns);
             col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
             write_color(std::cout, col);
         }

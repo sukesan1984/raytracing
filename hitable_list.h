@@ -14,13 +14,13 @@ public:
 		hitable_list(shared_ptr<hitable> object)  { add(object); }
 		void clear() { objects.clear(); }
 		void add(shared_ptr<hitable> object) { objects.push_back(object); }
-		virtual bool hit(const ray& r, float tmin, float tmax,
+		virtual bool hit(const ray& r, double tmin, double tmax,
 				hit_record& rec) const;
 public:
 	std::vector<shared_ptr<hitable>> objects;
 };
 
-bool hitable_list::hit(const ray& r, float t_min, float t_max,
+bool hitable_list::hit(const ray& r, double t_min, double t_max,
 		hit_record& rec) const {
 	hit_record temp_rec;
 	bool hit_anything = false;
