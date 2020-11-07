@@ -4,14 +4,15 @@
 #include <stdlib.h>
 #include "material.h"
 #include "hitable_list.h"
+#include "color.h"
 
-vec3 color(const ray& r, hitable *world, int depth) {
+vec3 ray_color(const ray& r, hitable *world, int depth) {
     hit_record rec;
     if (world->hit(r, 0.001, MAXFLOAT, rec)) {
         ray scattered;
         vec3 attenuation;
         if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
-            return attenuation * color(scattered, world, depth + 1);
+            return attenuation * ray_color(scattered, world, depth + 1);
         }
         else {
             return vec3(0, 0, 0);
@@ -103,14 +104,11 @@ int main() {
                 float u = float(i + drand48()) /float(nx);
                 float v = float(j + drand48()) / float(ny);
                 ray r = cam.get_ray(u, v);
-                col += color(r, world, 0);
+                col += ray_color(r, world, 0);
             }
             col /= float(ns);
-            int ir = int(255.99 * col[0]);
             col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
-            int ig = int(255.99 * col[1]);
-            int ib = int(255.99 * col[2]);
-            std::cout << ir << " " << ig << " " << ib << "\n";
+            write_color(std::cout, col);
         }
     }
 }
