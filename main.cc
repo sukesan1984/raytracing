@@ -25,8 +25,8 @@ vec3 color(const ray& r, hitable *world, int depth) {
 
 hitable *random_scene() {
     int n = 500;
-    int num_a = 11;
-    int num_b = 11;
+    int num_a = 3;
+    int num_b = 3;
     hitable **list = new hitable*[n+1];
     list[0] = new sphere(vec3(0, -1000, 0), 1000, new lambertian(
                 vec3(0.5, 0.5, 0.5)));
@@ -96,6 +96,7 @@ int main() {
     //hitable *world = new hitable_list(list, 2);
     hitable *world = random_scene();
     for (int j = ny - 1; j >= 0; j--) {
+        std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < nx; i++) {
             vec3 col(0, 0, 0);
             for (int s = 0; s < ns; s++) {
