@@ -31,8 +31,7 @@ hitable_list random_scene() {
     int num_a = 5;
     int num_b = 5;
     hitable_list world;
-    world.add(make_shared<sphere>(vec3(0, -1000, 0), 1000, new lambertian(
-                vec3(0.5, 0.5, 0.5))));
+    world.add(make_shared<sphere>(vec3(0, -1000, 0), 1000, make_shared<lambertian>(make_shared<solid_color>(0.5, 0.5, 0.5))));
     int i = 1;
     for (int a = -num_a; a < num_a; a++) {
         for (int b = -num_b; b < num_b; b++) {
@@ -40,15 +39,15 @@ hitable_list random_scene() {
             vec3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
             if ((center - vec3(4, 0.2, 0)).length() > 0.9) {
                 if (choose_mat < 0.8) {
-                    world.add(make_shared<sphere>(center, 0.2, new lambertian(
-                                vec3(random_double() * random_double(), random_double() * random_double(),
+                    world.add(make_shared<sphere>(center, 0.2, make_shared<lambertian>(
+                                make_shared<solid_color>(random_double() * random_double(), random_double() * random_double(),
                                     random_double() * random_double()))));
                 }
                 else if (choose_mat < 0.95) {
                     world.add(make_shared<sphere>(
                             center,
                             0.2,
-                            new metal(
+                            make_shared<metal>(
                                 vec3(
                                     0.5 * (1 + random_double()),
                                     0.5 * (1 + random_double()),
@@ -57,16 +56,16 @@ hitable_list random_scene() {
                             0.5 * random_double())));
                 }
                 else {
-                    world.add(make_shared<sphere>(center, 0.2, new dielectric(1.5)));
+                    world.add(make_shared<sphere>(center, 0.2, make_shared<dielectric>(1.5)));
                 }
             }
         }
     }
-    world.add(make_shared<sphere>(vec3(0, 1, 0), 1.0, new dielectric(1.5)));
+    world.add(make_shared<sphere>(vec3(0, 1, 0), 1.0, make_shared<dielectric>(1.5)));
     world.add(make_shared<sphere>(vec3(-4, 1, 0), 1.0,
-            new lambertian(vec3(0.4, 0.2, 0.1))));
+            make_shared<lambertian>(make_shared<solid_color>(0.4, 0.2, 0.1))));
     world.add(make_shared<sphere>(vec3(4, 1, 0), 1.0,
-            new metal(vec3(0.7, 0.6, 0.5), 0.0)));
+            make_shared<metal>(vec3(0.7, 0.6, 0.5), 0.0)));
     return hitable_list(make_shared<bvh_node>(world, 0.0, 1.0));
 }
 
