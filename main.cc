@@ -6,6 +6,7 @@
 #include "material.h"
 #include "hitable_list.h"
 #include "color.h"
+#include "bvh.h"
 
 vec3 ray_color(const ray& r, hitable_list world, int depth) {
     hit_record rec;
@@ -27,8 +28,8 @@ vec3 ray_color(const ray& r, hitable_list world, int depth) {
 
 hitable_list random_scene() {
     int n = 500;
-    int num_a = 1;
-    int num_b = 1;
+    int num_a = 5;
+    int num_b = 5;
     hitable_list world;
     world.add(make_shared<sphere>(vec3(0, -1000, 0), 1000, new lambertian(
                 vec3(0.5, 0.5, 0.5))));
@@ -66,7 +67,7 @@ hitable_list random_scene() {
             new lambertian(vec3(0.4, 0.2, 0.1))));
     world.add(make_shared<sphere>(vec3(4, 1, 0), 1.0,
             new metal(vec3(0.7, 0.6, 0.5), 0.0)));
-    return world;
+    return hitable_list(make_shared<bvh_node>(world, 0.0, 1.0));
 }
 
 int main() {
