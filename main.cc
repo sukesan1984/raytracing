@@ -31,7 +31,14 @@ hitable_list random_scene() {
     int num_a = 5;
     int num_b = 5;
     hitable_list world;
-    world.add(make_shared<sphere>(vec3(0, -1000, 0), 1000, make_shared<lambertian>(make_shared<solid_color>(0.5, 0.5, 0.5))));
+    auto checker = make_shared<checker_texture>(
+        make_shared<solid_color>(0.2, 0.3, 0.1),
+        make_shared<solid_color>(0.9, 0.9, 0.9)
+    );
+    //world.add(make_shared<sphere>(vec3(0, -1000, 0), 1000, make_shared<lambertian>(make_shared<solid_color>(0.5, 0.5, 0.5))));
+    world.add(
+        make_shared<sphere>(vec3(0, -1000, 0), 1000, make_shared<lambertian>(checker))
+    );
     int i = 1;
     for (int a = -num_a; a < num_a; a++) {
         for (int b = -num_b; b < num_b; b++) {
