@@ -26,6 +26,23 @@ vec3 ray_color(const ray& r, hitable_list world, int depth) {
     }
 }
 
+hitable_list two_spheres() {
+    hitable_list objects;
+
+    auto checker = make_shared<checker_texture>(
+        make_shared<solid_color>(0.2, 0.3, 0.1),
+        make_shared<solid_color>(0.9, 0.9, 0.9)
+    );
+
+    objects.add(
+        make_shared<sphere>(point3(0, -10, 0), 10, make_shared<lambertian>(checker))
+    );
+    objects.add(
+        make_shared<sphere>(point3(0, 10, 0), 10, make_shared<lambertian>(checker))
+    );
+    return objects;
+}
+
 hitable_list random_scene() {
     int n = 500;
     int num_a = 5;
@@ -82,12 +99,17 @@ int main() {
     int ns = 100;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
     hitable *list[4];
-    vec3 lookfrom(12, 2, 3);
-    vec3 lookat(4, 1, 1);
-
-    double dist_to_focus = (lookfrom - lookat).length();
-    double aperture = 0.1;
-    camera cam(lookfrom, lookat, vec3(0, 1, 0), 20, double(nx) / double(ny), aperture, dist_to_focus);
+    //point3 lookfrom(12, 2, 3);
+    //point3 lookat(4, 1, 1);
+    //double dist_to_focus = (lookfrom - lookat).length();
+    //double aperture = 0.1;
+    //camera cam(lookfrom, lookat, vup, 20, double(nx) / double(ny), aperture, dist_to_focus);
+    point3 lookfrom(13, 2, 3);
+    point3 lookat(0, 0, 0);
+    vec3 vup(0, 1, 0);
+    double dist_to_focus = 10.0;
+    double aperture = 0.0;
+    camera cam(lookfrom, lookat, vup, 20, double(nx) / double(ny), aperture, dist_to_focus);
     //double R = cos(M_PI / 4);
     //list[0] = new sphere(vec3(-R, 0, -1), R,
     //        new lambertian(vec3(0, 0, 1)));
@@ -103,7 +125,8 @@ int main() {
     //        new dielectric(1.5));
     //hitable *world = new hitable_list(list, 4);
     //hitable *world = new hitable_list(list, 2);
-    auto world = random_scene();
+    ///auto world = random_scene();
+    auto world = two_spheres();
     for (int j = ny - 1; j >= 0; j--) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < nx; i++) {
