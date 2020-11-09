@@ -43,6 +43,19 @@ hitable_list two_spheres() {
     return objects;
 }
 
+hitable_list two_perlin_spheres() {
+    hitable_list objects;
+
+    auto pertext = make_shared<noise_texture>();
+    objects.add(make_shared<sphere>(
+        point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext))
+    );
+    objects.add(make_shared<sphere>(
+        point3(0, 2, 0), 2, make_shared<lambertian>(pertext))
+    );
+    return objects;
+}
+
 hitable_list random_scene() {
     int n = 500;
     int num_a = 5;
@@ -126,7 +139,8 @@ int main() {
     //hitable *world = new hitable_list(list, 4);
     //hitable *world = new hitable_list(list, 2);
     ///auto world = random_scene();
-    auto world = two_spheres();
+    //auto world = two_spheres();
+    auto world = two_perlin_spheres();
     for (int j = ny - 1; j >= 0; j--) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < nx; i++) {

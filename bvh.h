@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <algorithm>
+#include "rtweekend.h"
 
 class bvh_node : public hitable {
 public:
@@ -45,11 +45,6 @@ bool bvh_node::hit(
 	bool hit_left = left->hit(r, t_min, t_max, rec);
 	bool hit_right = right->hit(r, t_min, hit_left ? rec.t : t_max, rec);
 	return hit_left || hit_right;
-}
-
-inline int random_int(int min, int max) {
-	// {min, min+1, ...max}から整数をランダムに返す
-	return min + rand() % (max - min + 1);
 }
 
 inline bool box_compare(

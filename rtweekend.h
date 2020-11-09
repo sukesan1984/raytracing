@@ -1,6 +1,7 @@
 #ifndef RTWEEKEND_H
 #define RTWEEKEND_H
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <limits>
@@ -20,6 +21,12 @@ const double pi = 3.1415926535897932385;
 inline double degrees_to_radians(double degrees) {
 	return degrees * pi / 180;
 }
+
+inline int random_int(int min, int max) {
+	// {min, min+1, ...max}から整数をランダムに返す
+	return min + rand() % (max - min + 1);
+}
+
 
 inline double random_double() {
 	static std::uniform_real_distribution<double> distribution(0.0, 1.0);
