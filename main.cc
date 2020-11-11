@@ -1,5 +1,6 @@
 #include <iostream>
 #include "rtweekend.h"
+#include "rtw_stb_image.h"
 #include "camera.h"
 #include "sphere.h"
 #include <stdlib.h>
@@ -24,6 +25,13 @@ vec3 ray_color(const ray& r, hitable_list world, int depth) {
         double t = 0.5 * (unit_direction.y() + 1.0);
         return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
     }
+}
+
+hitable_list earth() {
+    auto earth_texture = make_shared<image_texture>("earth.jpg");
+    auto earth_surface = make_shared<lambertian>(earth_texture);
+    auto globe = make_shared<sphere>(point3(0,0,0), 2, earth_surface);
+    return hitable_list(globe);
 }
 
 hitable_list two_spheres() {
@@ -141,7 +149,8 @@ int main() {
     //hitable *world = new hitable_list(list, 2);
     ///auto world = random_scene();
     //auto world = two_spheres();
-    auto world = two_perlin_spheres();
+    //auto world = two_perlin_spheres();
+    auto world = earth();
     for (int j = ny - 1; j >= 0; j--) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < nx; i++) {
