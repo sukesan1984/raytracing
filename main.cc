@@ -3,28 +3,41 @@
 #include "rtw_stb_image.h"
 #include "camera.h"
 #include "sphere.h"
+#include "aarect.h"
 #include <stdlib.h>
 #include "material.h"
 #include "hitable_list.h"
 #include "color.h"
 #include "bvh.h"
 
-vec3 ray_color(const ray& r, hitable_list world, int depth) {
+vec3 ray_color(const ray& r, const color& background, hitable_list world, int depth) {
     hit_record rec;
-    if (world.hit(r, 0.001, MAXFLOAT, rec)) {
-        ray scattered;
-        vec3 attenuation;
-        if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
-            return attenuation * ray_color(scattered, world, depth + 1);
-        }
-        else {
-            return vec3(0, 0, 0);
-        }
-    } else {
-        vec3 unit_direction = unit_vector(r.direction());
-        double t = 0.5 * (unit_direction.y() + 1.0);
-        return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
-    }
+    if (depth <= 0)
+        return color(0, 0, 0);
+    if (!world.hit(r, 0.001, MAXFLOAT, rec))
+        return background;
+    ray scattered;
+    vec3 attenuation;
+    color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+    if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+        return emitted;
+    return emitted + attenuation * ray_color(scattered, background, world, depth - 1);
+}
+
+hitable_list simple_light() {
+    hitable_list objects;
+    auto pertext = make_shared<noise_texture>(4);
+    objects.add(make_shared<sphere>(
+        point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext))
+    );
+    objects.add(make_shared<sphere>(
+        point3(0, 2, 0), 2, make_shared<lambertian>(pertext))
+    );
+
+    auto difflight = make_shared<diffuse_light>(make_shared<solid_color>(4, 4, 4));
+    objects.add(make_shared<sphere>(point3(0, 7, 0), 2, difflight));
+    objects.add(make_shared<xy_rect>(3, 5, 1, 3, -2, difflight));
+    return objects;
 }
 
 hitable_list earth() {
@@ -126,11 +139,13 @@ int main() {
     //double dist_to_focus = (lookfrom - lookat).length();
     //double aperture = 0.1;
     //camera cam(lookfrom, lookat, vup, 20, double(nx) / double(ny), aperture, dist_to_focus);
-    point3 lookfrom(13, 2, 3);
+    //point3 lookfrom(13, 2, 3);
+    point3 lookfrom(40, 8, 3);
     point3 lookat(0, 0, 0);
     vec3 vup(0, 1, 0);
     double dist_to_focus = 10.0;
     double aperture = 0.0;
+    const color background(0, 0, 0);
     camera cam(lookfrom, lookat, vup, 20, double(nx) / double(ny), aperture, dist_to_focus);
     //double R = cos(M_PI / 4);
     //list[0] = new sphere(vec3(-R, 0, -1), R,
@@ -150,7 +165,8 @@ int main() {
     ///auto world = random_scene();
     //auto world = two_spheres();
     //auto world = two_perlin_spheres();
-    auto world = earth();
+    //auto world = earth();
+    auto world = simple_light();
     for (int j = ny - 1; j >= 0; j--) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < nx; i++) {
@@ -159,7 +175,7 @@ int main() {
                 double u = (i + random_double()) /double(nx);
                 double v = (j + random_double()) / double(ny);
                 ray r = cam.get_ray(u, v);
-                col += ray_color(r, world, 0);
+                col += ray_color(r, background, world, 50);
             }
             //col /= double(ns);
             //col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
