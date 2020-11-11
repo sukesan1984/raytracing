@@ -47,6 +47,7 @@ hitable_list two_perlin_spheres() {
     hitable_list objects;
 
     auto pertext = make_shared<noise_texture>(5);
+    //auto pertext = make_shared<turbulence_texture>();
     objects.add(make_shared<sphere>(
         point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext))
     );
