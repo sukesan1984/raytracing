@@ -14,7 +14,7 @@ vec3 ray_color(const ray& r, const color& background, hitable_list world, int de
     hit_record rec;
     if (depth <= 0)
         return color(0, 0, 0);
-    if (!world.hit(r, 0.001, MAXFLOAT, rec))
+    if (!world.hit(r, 0.001, infinity, rec))
         return background;
     ray scattered;
     vec3 attenuation;
@@ -22,6 +22,24 @@ vec3 ray_color(const ray& r, const color& background, hitable_list world, int de
     if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
         return emitted;
     return emitted + attenuation * ray_color(scattered, background, world, depth - 1);
+}
+
+hitable_list cornell_box() {
+    hitable_list objects;
+
+    auto red   = make_shared<lambertian>(make_shared<solid_color>(.65, .05, .05));
+    auto white = make_shared<lambertian>(make_shared<solid_color>(.73, .73, .73));
+    auto green = make_shared<lambertian>(make_shared<solid_color>(.12, .45, .15));
+    auto light = make_shared<diffuse_light>(make_shared<solid_color>(15, 15, 15));
+
+    objects.add(make_shared<yz_rect>(0, 555, 0, 555, 555, green));
+    objects.add(make_shared<yz_rect>(0, 555, 0, 555, 0, red));
+    objects.add(make_shared<xz_rect>(213, 343, 227, 332, 554, light));
+    objects.add(make_shared<xz_rect>(0, 555, 0, 555, 0, white));
+    objects.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));
+    objects.add(make_shared<xy_rect>(0, 555, 0, 555, 555, white));
+
+    return objects;
 }
 
 hitable_list simple_light() {
@@ -79,7 +97,6 @@ hitable_list two_perlin_spheres() {
 }
 
 hitable_list random_scene() {
-    int n = 500;
     int num_a = 5;
     int num_b = 5;
     hitable_list world;
@@ -91,7 +108,6 @@ hitable_list random_scene() {
     world.add(
         make_shared<sphere>(vec3(0, -1000, 0), 1000, make_shared<lambertian>(checker))
     );
-    int i = 1;
     for (int a = -num_a; a < num_a; a++) {
         for (int b = -num_b; b < num_b; b++) {
             double choose_mat = random_double();
@@ -131,26 +147,41 @@ hitable_list random_scene() {
 int main() {
     //int nx = 400;
     //int ny = 200;
-    const auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 384;
-    const int image_height = static_cast<int>(image_width / aspect_ratio);
-    int samples_per_pixel = 100;
     const int max_depth = 50;
+    const color background(0, 0, 0);
+
+    // for Simple Light
+    //const auto aspect_ratio = 16.0 / 9.0;
+    //const int image_width = 384;
+    //const int image_height = static_cast<int>(image_width / aspect_ratio);
+    //int samples_per_pixel = 100;
+    //point3 lookfrom(26, 3, 6);
+    //point3 lookat(0, 2, 0);
+    //vec3 vup(0, 1, 0);
+    //double dist_to_focus = 10.0;
+    //double aperture = 0.0;
+    //camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
+
+    // for cornell_box
+    const auto aspect_ratio = 1.0;
+    const int image_width = 500;
+    const int image_height = static_cast<int>(image_width / aspect_ratio);
+    int samples_per_pixel = 500;
+    point3 lookfrom(278, 278, -800);
+    point3 lookat(278, 278, 0);
+    vec3 vup(0, 1, 0);
+    auto dist_to_focus = 10.0;
+    auto aperture = 0.0;
+    auto vfov = 40.0;
+    camera cam(lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus);
     std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
 
-    point3 lookfrom(26, 3, 6);
-    point3 lookat(0, 2, 0);
-    vec3 vup(0, 1, 0);
-    double dist_to_focus = 10.0;
-    double aperture = 0.0;
-    const color background(0, 0, 0);
-    camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
-    auto world = simple_light();
+    auto world = cornell_box();
+    //auto world = simple_light();
     ///auto world = random_scene();
     //auto world = two_spheres();
     //auto world = two_perlin_spheres();
     //auto world = earth();
-    //auto world = cornell_box();
     for (int j = image_height - 1; j >= 0; --j) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < image_width; ++i) {

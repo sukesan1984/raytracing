@@ -2,7 +2,7 @@ NAME=raytracing
 SRCS=main.cc
 OBJS=$(SRCS:.c=.o)
 CC=g++
-FLAGS= -std=c++17 -Wc++11-extensions
+FLAGS=-Wall -Wno-overloaded-virtual -O3 -std=c++14
 
 all: $(NAME)
 
