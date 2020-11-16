@@ -35,7 +35,7 @@ hitable_list simple_light() {
     );
 
     auto difflight = make_shared<diffuse_light>(make_shared<solid_color>(4, 4, 4));
-    objects.add(make_shared<sphere>(point3(0, 7, 0), 2, difflight));
+    //objects.add(make_shared<sphere>(point3(0, 7, 0), 2, difflight));
     objects.add(make_shared<xy_rect>(3, 5, 1, 3, -2, difflight));
     return objects;
 }
@@ -129,57 +129,41 @@ hitable_list random_scene() {
 }
 
 int main() {
-    int nx = 400;
-    int ny = 200;
-    int ns = 100;
-    std::cout << "P3\n" << nx << " " << ny << "\n255\n";
-    hitable *list[4];
-    //point3 lookfrom(12, 2, 3);
-    //point3 lookat(4, 1, 1);
-    //double dist_to_focus = (lookfrom - lookat).length();
-    //double aperture = 0.1;
-    //camera cam(lookfrom, lookat, vup, 20, double(nx) / double(ny), aperture, dist_to_focus);
-    //point3 lookfrom(13, 2, 3);
-    point3 lookfrom(40, 8, 3);
-    point3 lookat(0, 0, 0);
+    //int nx = 400;
+    //int ny = 200;
+    const auto aspect_ratio = 16.0 / 9.0;
+    const int image_width = 384;
+    const int image_height = static_cast<int>(image_width / aspect_ratio);
+    int samples_per_pixel = 100;
+    const int max_depth = 50;
+    std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
+
+    point3 lookfrom(26, 3, 6);
+    point3 lookat(0, 2, 0);
     vec3 vup(0, 1, 0);
     double dist_to_focus = 10.0;
     double aperture = 0.0;
     const color background(0, 0, 0);
-    camera cam(lookfrom, lookat, vup, 20, double(nx) / double(ny), aperture, dist_to_focus);
-    //double R = cos(M_PI / 4);
-    //list[0] = new sphere(vec3(-R, 0, -1), R,
-    //        new lambertian(vec3(0, 0, 1)));
-    //list[1] = new sphere(vec3(R, 0, -1), R,
-    //        new lambertian(vec3(1, 0, 0)));
-    //list[0] = new sphere(vec3(0, 0, -1), 0.5,
-    //        new lambertian(vec3(0.1, 0.2, 0.5)));
-    //list[1] = new sphere(vec3(0, -100.5, -1), 100,
-    //        new lambertian(vec3(0.8, 0.8, 0.0)));
-    //list[2] = new sphere(vec3(1, 0, -1), 0.5,
-    //        new metal(vec3(0.8, 0.6, 0.2), 0.3));
-    //list[3] = new sphere(vec3(-1, 0, -1), -0.45,
-    //        new dielectric(1.5));
-    //hitable *world = new hitable_list(list, 4);
-    //hitable *world = new hitable_list(list, 2);
+    camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
+    auto world = simple_light();
     ///auto world = random_scene();
     //auto world = two_spheres();
     //auto world = two_perlin_spheres();
     //auto world = earth();
-    auto world = simple_light();
-    for (int j = ny - 1; j >= 0; j--) {
+    //auto world = cornell_box();
+    for (int j = image_height - 1; j >= 0; --j) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
-        for (int i = 0; i < nx; i++) {
+        for (int i = 0; i < image_width; ++i) {
             vec3 col(0, 0, 0);
-            for (int s = 0; s < ns; s++) {
-                double u = (i + random_double()) /double(nx);
-                double v = (j + random_double()) / double(ny);
+            for (int s = 0; s < samples_per_pixel; ++s) {
+                double u = (i + random_double()) /double(image_width - 1);
+                double v = (j + random_double()) / double(image_height - 1);
                 ray r = cam.get_ray(u, v);
-                col += ray_color(r, background, world, 50);
+                col += ray_color(r, background, world, max_depth);
             }
             //col /= double(ns);
             //col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
-            write_color(std::cout, col, ns);
+            write_color(std::cout, col, samples_per_pixel);
         }
     }
 }

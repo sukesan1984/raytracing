@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <iostream>
+#include "rtweekend.h"
 
 class vec3 {
 	public:
@@ -150,5 +151,29 @@ inline vec3 unit_vector(vec3 v) {
 
 using point3 = vec3;
 using color = vec3;
+
+vec3 random_in_unit_sphere() {
+    vec3 p;
+    do {
+        p = 2.0 * vec3(drand48(), drand48(), drand48()) -
+            vec3(1, 1, 1);
+    } while (p.length_squared() >= 1.0);
+    return p;
+}
+
+vec3 random_unit_vector() {
+	auto a = random_double(0, 2*pi);
+	auto z = random_double(-1, 1);
+	auto r = sqrt(1 - z*z);
+	return vec3(r * cos(a), r * sin(a), z);
+}
+
+vec3 random_in_hemisphere(const vec3& normal) {
+	vec3 in_unit_sphere = random_in_unit_sphere();
+	if (dot(in_unit_sphere, normal) > 0.0)
+		return in_unit_sphere;
+	else
+		return -in_unit_sphere;
+}
 
 #endif
