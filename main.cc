@@ -1,9 +1,12 @@
 #include <iostream>
+#include "hitable.h"
 #include "rtweekend.h"
 #include "rtw_stb_image.h"
 #include "camera.h"
 #include "sphere.h"
+#include "box.h"
 #include "aarect.h"
+#include <memory>
 #include <stdlib.h>
 #include "material.h"
 #include "hitable_list.h"
@@ -38,6 +41,16 @@ hitable_list cornell_box() {
     objects.add(make_shared<xz_rect>(0, 555, 0, 555, 0, white));
     objects.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));
     objects.add(make_shared<xy_rect>(0, 555, 0, 555, 555, white));
+
+    shared_ptr<hitable> box1 = make_shared<box>(point3(0, 0, 0), point3(165, 330, 165), white);
+    box1 = make_shared<rotate_y>(box1, 15);
+    box1 = make_shared<translate>(box1, vec3(265, 0, 295));
+    objects.add(box1);
+
+    shared_ptr<hitable> box2 = make_shared<box>(point3(0, 0, 0), point3(165, 165, 165), white);
+    box2 = make_shared<rotate_y>(box2, -18);
+    box2 = make_shared<translate>(box2,  vec3(130, 0, 65));
+    objects.add(box2);
 
     return objects;
 }
@@ -142,6 +155,11 @@ hitable_list random_scene() {
     world.add(make_shared<sphere>(vec3(4, 1, 0), 1.0,
             make_shared<metal>(vec3(0.7, 0.6, 0.5), 0.0)));
     return hitable_list(make_shared<bvh_node>(world, 0.0, 1.0));
+}
+
+double get_time(clock_t start, clock_t target)
+{
+    return static_cast<double>(target - start) / CLOCKS_PER_SEC * 1000.0;
 }
 
 int main() {

@@ -1,3 +1,5 @@
+#ifndef AARECTH
+#define AARECTH
 class xy_rect: public hitable {
 public:
 	xy_rect() {}
@@ -122,3 +124,4 @@ bool yz_rect::hit(const ray& r, double t0, double t1, hit_record& rec) const {
 	rec.p = r.at(t);
 	return true;
 }
+#endif
